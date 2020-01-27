@@ -1,0 +1,23 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+canvas.layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+canvas.layer.ui {
+    z-index: 10;
+}
+
+canvas.layer.game {
+    z-index: 5;
+}
+
+canvas.layer.background {
+    z-index: 0;
+}
