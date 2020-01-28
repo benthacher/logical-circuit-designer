@@ -100,8 +100,8 @@ class Wire {
         this.value = value;
     }
 
-    copy() {
-        let copy = new Wire(this.color).setStart(this.start).setEnd(this.end, this.endIndex).setValue(this.value);
+    copy(start, end, endIndex) {
+        let copy = new Wire(this.color).setStart(start).setEnd(end, endIndex).setValue(this.value);
         copy.stops = [...this.stops];
         
         return copy;

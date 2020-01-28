@@ -152,8 +152,11 @@ class Gate {
         gates.splice(gates.indexOf(this), 1);
     }
 
-    copy(clazz) {
-        let copy = new clazz(this.pos.copy(), this.numInputs);
+    copy() {
+        let copy = new this.constructor(this.pos.copy(), this.numInputs);
+
+        if (this instanceof Input)
+            copy.value = this.value;
 
         this.inputs.forEach((input, i) => {
             if (input)
