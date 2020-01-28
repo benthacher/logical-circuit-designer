@@ -13,5 +13,5 @@ Run on chrome version 51 or higher.
 ### TODO:
 - [ ] Change right, middle, and left click functions into one big toolbar
 - [ ] Fix wire snapping
-- [ ] Create Undo/Redo stack feature
+- [X] Create Undo/Redo stack feature
 - [ ] Clean up minor bugs

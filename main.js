@@ -6,8 +6,6 @@ let inputA;
 
 let drawGrid = true;
 
-let canAddAndGate = true;
-
 function init() {
     setBackground('white');
 
@@ -25,6 +23,11 @@ function init() {
     callbackHandler.attach('c', CallbackMode.PRESS, () => Wire.showColors = !Wire.showColors);
 
     callbackHandler.attach('Escape', CallbackMode.PRESS, () => toolbars.forEach(toolbar => toolbar.hide()));
+
+    callbackHandler.attach('z', CallbackMode.SHORTCUT, GameState.undo);
+    callbackHandler.attach('y', CallbackMode.SHORTCUT, GameState.redo);
+
+    GameState.save();
 }
 
 function draw() {

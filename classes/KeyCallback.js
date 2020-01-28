@@ -2,7 +2,8 @@
 const CallbackMode = Object.freeze({
     HOLD: 0,
     PRESS: 1,
-    RELEASE: 2
+    RELEASE: 2,
+    SHORTCUT: 3
 });
 
 class KeyCallback {

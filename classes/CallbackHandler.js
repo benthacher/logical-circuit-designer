@@ -47,14 +47,20 @@ class CallbackHandler {
                     break;
                 case CallbackMode.PRESS:
                     if (keys[keyCallback.keys[0]].pressed && keys[keyCallback.keys[0]].canBePressed) {
-                        keyCallback.callback();
                         keys[keyCallback.keys[0]].canBePressed = false;
+                        keyCallback.callback();
                     }
                     break;
                 case CallbackMode.RELEASE:
                     if (keys[keyCallback.keys[0]].released && keys[keyCallback.keys[0]].canBeReleased) {
-                        keyCallback.callback();
                         keys[keyCallback.keys[0]].canBeReleased = false;
+                        keyCallback.callback();
+                    }
+                    break;
+                case CallbackMode.SHORTCUT:
+                    if (keys[keyCallback.keys[0]].pressed && keys[keyCallback.keys[0]].canBePressed && keys['Control'].pressed) {
+                        keys[keyCallback.keys[0]].canBePressed = false;
+                        keyCallback.callback();
                     }
                     break;
             }

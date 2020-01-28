@@ -155,17 +155,12 @@ class Gate {
     copy() {
         let copy = new this.constructor(this.pos.copy(), this.numInputs);
 
-        if (this instanceof Input)
+        if (this instanceof Input) {
             copy.value = this.value;
+            copy.label = this.label;
+        }
 
-        this.inputs.forEach((input, i) => {
-            if (input)
-                copy.inputs[i] = input.copy();
-        });
-        
-        this.outputs.forEach((output, i) => {
-            copy.outputs[i] = output.copy();
-        });
+        return copy;
     }
 }
 

@@ -257,6 +257,8 @@ window.onmouseup = e => {
 
     mouse.connectionStart = null;
     mouse.connectionEnd = null;
+
+    GameState.save();
 }
 
 window.onkeydown = e => {

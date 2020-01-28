@@ -4,6 +4,10 @@ class Vector {
         this.y = y;
     }
 
+    equals(other) {
+        return this.x == other.x && this.y == other.y;
+    }
+
     set(vector) {
         this.x = vector.x;
         this.y = vector.y;
