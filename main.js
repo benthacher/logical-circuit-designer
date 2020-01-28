@@ -101,7 +101,7 @@ function logic() {
                     else
                         pos = mouse.connectionStart.gate.getOutputDisplayPos();
 
-                    lineTo(pos.x, pos.y, mouse.getMapPos().x, mouse.getMapPos().y, 'black', Gate.wireThickness, true, Layer.GAME);
+                    lineTo(pos.x, pos.y, mouse.getMapPos().x, mouse.getMapPos().y, Wire.noColor, Wire.wireThickness, true, Layer.GAME);
                     canvases[Layer.UI].style.cursor = 'crosshair';
                 }
                 break;

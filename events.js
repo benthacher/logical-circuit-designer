@@ -236,7 +236,7 @@ window.onmouseup = e => {
         });
 
         if (mouse.connectionStart && mouse.connectionEnd) {
-            let connection = new Wire('black', Gate.wireThickness);
+            let connection = new Wire();
 
             console.log(mouse.connectionEnd.i);
 

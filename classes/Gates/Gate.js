@@ -82,7 +82,7 @@ class Gate {
             let displayPos = this.getInputDisplayPos(i);
             let screenCoords = calcScreenCoords(displayPos);
 
-            ctx.lineWidth = Gate.wireThickness * camera.zoom;
+            ctx.lineWidth = Wire.wireThickness * camera.zoom;
             ctx.strokeStyle = 'black';
 
             ctx.beginPath();
@@ -100,7 +100,7 @@ class Gate {
         let outputDisplayPos = this.getOutputDisplayPos();
         let screenCoords = calcScreenCoords(outputDisplayPos);
 
-        ctx.lineWidth = Gate.wireThickness * camera.zoom;
+        ctx.lineWidth = Wire.wireThickness * camera.zoom;
         ctx.strokeStyle = 'black';
 
         ctx.beginPath();
@@ -121,7 +121,7 @@ class Gate {
  * @param {Gate} other 
  */
     connect(other) {
-        let connection = new Wire('black', Gate.wireThickness);
+        let connection = new Wire();
 
         this.attachOutput(connection);
         other.attachInput(connection, this.connectedInputs);
@@ -166,7 +166,6 @@ class Gate {
     }
 }
 
-Gate.wireThickness = 4;
 Gate.gridSize = 20;
 Gate.width = Gate.gridSize * 4;
 Gate.height = Gate.gridSize * 2;

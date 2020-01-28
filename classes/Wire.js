@@ -1,18 +1,11 @@
 let wires = [];
 
 class Wire {
-    constructor(color, thickness) {
+    constructor() {
         // array of position vectors where a break in the wire is made
         this.stops = [];
-        this.color = color;
-        this.thickness = thickness;
 
         this.value;
-    }
-
-    setColor(color) {
-        this.color = color;
-        return this;
     }
 
     setStart(start) {
@@ -74,7 +67,7 @@ class Wire {
     }
 
     draw() {
-        this.color = Wire.showColors ? (this.value ? Wire.trueColor : Wire.falseColor) : 'black';
+        this.color = Wire.showColors ? (this.value ? Wire.trueColor : Wire.falseColor) : Wire.noColor;
         let ctx = layers[Layer.GAME];
 
         let drawStart = calcScreenCoords(this.start.getOutputDisplayPos());
@@ -90,7 +83,7 @@ class Wire {
 
         ctx.lineTo(drawEnd.x, drawEnd.y);
         
-        ctx.lineWidth = this.thickness * camera.zoom;
+        ctx.lineWidth = Wire.wireThickness * camera.zoom;
         ctx.strokeStyle = this.color;
 
         ctx.stroke();
@@ -108,7 +101,7 @@ class Wire {
     }
 
     copy() {
-        let copy = new Wire(this.color, this.thickness).setStart(this.start).setEnd(this.end, this.endIndex).setValue(this.value);
+        let copy = new Wire(this.color).setStart(this.start).setEnd(this.end, this.endIndex).setValue(this.value);
         copy.stops = [...this.stops];
         
         return copy;
@@ -117,8 +110,10 @@ class Wire {
 
 Wire.trueColor = '#0f0';
 Wire.falseColor = '#f00';
+Wire.noColor = 'black';
 Wire.displayStops = false;
 Wire.showColors = false;
+Wire.wireThickness = 4;
 
 Wire.toggleWireColors = () => Wire.showColors = !Wire.showColors; 
 
