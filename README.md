@@ -10,7 +10,7 @@ For now, the app simply runs in browser by opening the `index.html`.
 
 Run on chrome version 51 or higher.
 
-### Controls
+## Controls
 ###### (soon to be updated in favor of a toolbar)
 #### Mouse
 - Left click:
@@ -27,7 +27,7 @@ Run on chrome version 51 or higher.
 - Ctrl+z: undo
 - Ctrl+y: redo
 
-### TODO:
+## TODO:
 - [ ] Change right, middle, and left click functions into one big toolbar
 - [ ] Fix wire snapping
 - [X] Create Undo/Redo stack feature
