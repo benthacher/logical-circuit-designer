@@ -1,13 +1,19 @@
 let mouse = new Mouse();
 
 const gateTypes = [AndGate, NandGate, OrGate, NorGate, XorGate, XnorGate, Inverter];
-const Tool = Object.freeze({
-    Add: 0,
-    Delete: 1,
-    Edit: 2,
-    Move: 3,
-    Pan: 4,
-});
+
+// Pretty gross looking enum below:
+// Takes array of Tool names and uses Array.prototype.reduce to create an object in the form:
+//      {
+//          [Toolname]: [key to press],
+//           ...
+//      }
+// The only reason I did this was to make it easier to rearrange the tools if I wanted to
+
+const Tool = Object.freeze(
+    ['Move', 'Add', 'Delete', 'Edit', 'Pan']
+    .reduce((obj, val, i) => Object.assign(obj, { [val]: i + 1 }), {}));
+
 let currentTool = Tool.Add;
 
 let addComponentMenu = new Toolbar()
@@ -19,9 +25,11 @@ let addComponentMenu = new Toolbar()
                         .add(
                             new ToolbarItem('Input.png', 50, 50, () => {
                                 let label = prompt('Label for input:');
+                                if (!label)
+                                    return;
                                 let value = prompt('Value for input:');
 
-                                if (label && value)
+                                if (value)
                                     new Input(mouse.getMapPos(), label, value == 'true').push()
                             }, true)
                         )
@@ -46,7 +54,7 @@ let editComponentMenu = new Toolbar()
                         .setHoverColor('#dedede')
                         .setPos(zeroVector.copy())
                         .add([
-                            new ToolbarItem('numInputs.png', 50, 50, () => editingComponent.setNumInputs(prompt('Num inputs:')), true),
+                            new ToolbarItem('numInputs.png', 50, 50, () => editingComponent.setNumInputs(prompt('Num inputs:') || 1), true),
                             new ToolbarItem('toggleOutput.png', 50, 50, () => {
                                 if (editingComponent.setValue)
                                     editingComponent.setValue(!editingComponent.value)
@@ -290,6 +298,7 @@ window.onmouseup = e => {
 }
 
 window.onkeydown = e => {
+    // console.log(e.key);
     if (!keys[e.key])
         keys[e.key] = {};
     keys[e.key].pressed = true;

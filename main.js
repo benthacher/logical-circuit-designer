@@ -27,11 +27,20 @@ function init() {
     callbackHandler.attach('z', CallbackMode.SHORTCUT, GameState.undo);
     callbackHandler.attach('y', CallbackMode.SHORTCUT, GameState.redo);
 
+    for (let [toolName, enumVal] of Object.entries(Tool)) {
+        console.log(toolName, enumVal);
+        callbackHandler.attach(enumVal + '', CallbackMode.PRESS, () => {
+            currentTool = parseInt(enumVal);
+            console.log(currentTool, enumVal);
+        });
+    }
+    // callbackHandler.attach('1', CallbackMode.PRESS, () => console.log('1'));
+
     GameState.save();
 }
 
 function draw() {
-    // camera.update(map.width, map.height);
+    camera.update(map.width, map.height);
     
     clear(Layer.GAME);
     clear(Layer.UI);
@@ -52,7 +61,7 @@ function draw() {
 
     switch (currentTool) {
         case Tool.Move:
-            canvases[Layer.UI].style.cursor = 'grab';
+            canvases[Layer.UI].style.cursor = mouse.down ? 'grabbing' : 'grab';
             break;
         case Tool.Pan:
             canvases[Layer.UI].style.cursor = 'move';
@@ -71,21 +80,8 @@ function draw() {
 
 function logic() {
     if (mouse.down) {
-        switch (mouse.which) {
-            case 2:
-                let cameraPrevPos = camera.pos.copy();
-                drag(camera.pos, true);
-
-                if (Wire.displayStops) {
-                    wires.forEach(wire => {
-                        wire.stops.forEach((stop, i) => {
-                            if (dist(stop, mouse.getMapPos()) < Gate.ioDisplayRadius)
-                                wire.stops.splice(i, 1);
-                        });
-                    });
-                }
-                break;
-            case 1:
+        switch (currentTool) {
+            case Tool.Move:
                 gates.forEach(gate => {
                     if (gate == mouse.draggingObj) {
                         if (mouse.draggingObjPos)
@@ -110,6 +106,51 @@ function logic() {
                         });
                     });
                 }
+                break;
+            case Tool.Pan:
+                drag(camera.pos, true);
+                break;
+        }
+
+
+        switch (mouse.which) {
+            case 2:
+                // drag(camera.pos, true);
+
+                if (Wire.displayStops) {
+                    wires.forEach(wire => {
+                        wire.stops.forEach((stop, i) => {
+                            if (dist(stop, mouse.getMapPos()) < Gate.ioDisplayRadius)
+                                wire.stops.splice(i, 1);
+                        });
+                    });
+                }
+                break;
+            case 1:
+                // gates.forEach(gate => {
+                //     if (gate == mouse.draggingObj) {
+                //         if (mouse.draggingObjPos)
+                //             gate.pos.set(
+                //                 mouse.draggingObjPos
+                //                     .subtract(mouse.drag
+                //                         .subtract(mouse.pos)
+                //                         .divide(camera.zoom)));
+                //     }
+                // });
+                // if (Wire.displayStops) {
+                //     wires.forEach(wire => {
+                //         wire.stops.forEach(stop => {
+                //             if (stop == mouse.draggingObj) {
+                //                 if (mouse.draggingObjPos)
+                //                     stop.set(
+                //                         mouse.draggingObjPos
+                //                             .subtract(mouse.drag
+                //                                 .subtract(mouse.pos)
+                //                                 .divide(camera.zoom)));
+                //             }
+                //         });
+                //     });
+                // }
                 if (mouse.connectionStart) {
                     let pos;
                     if (mouse.connectionStart.i > -1)
