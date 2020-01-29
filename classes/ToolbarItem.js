@@ -11,7 +11,7 @@ class ToolbarItem {
     }
 
     draw() {
-        let color = this.beingHovered ? this.parentToolbar.hoverColor : (this.beingClicked ? this.parentToolbar.clickColor : this.parentToolbar.backgroundColor);
+        let color = this.beingClicked ? this.parentToolbar.clickColor : (this.beingHovered ? this.parentToolbar.hoverColor : this.parentToolbar.backgroundColor);
         let ctx = layers[Layer.UI];
 
         rect(this.displayOffset.x, this.displayOffset.y, this.width, this.height, color, false, Layer.UI);

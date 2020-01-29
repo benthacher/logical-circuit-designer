@@ -22,7 +22,7 @@ function init() {
     callbackHandler.attach('g', CallbackMode.PRESS, () => drawGrid = !drawGrid);
     callbackHandler.attach('c', CallbackMode.PRESS, () => Wire.showColors = !Wire.showColors);
 
-    callbackHandler.attach('Escape', CallbackMode.PRESS, () => toolbars.forEach(toolbar => toolbar.hide()));
+    callbackHandler.attach('Escape', CallbackMode.PRESS, hideContextMenus);
 
     callbackHandler.attach('z', CallbackMode.SHORTCUT, GameState.undo);
     callbackHandler.attach('y', CallbackMode.SHORTCUT, GameState.redo);

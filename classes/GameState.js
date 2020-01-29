@@ -83,7 +83,6 @@ GameState.save = () => {
     GameState.states.push(new GameState());
 
     GameState.statePointer++;
-    console.log(GameState.statePointer);
 }
 
 GameState.undo = () => {
@@ -97,7 +96,6 @@ GameState.redo = () => {
 }
 
 GameState.restore = index => {
-    console.log(index);
     if (index > -1 && index < GameState.states.length)
         GameState.states[index].restore();
 }

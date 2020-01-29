@@ -1,13 +1,14 @@
 let mouse = new Mouse();
 
-let gateTypes = [AndGate, NandGate, OrGate, NorGate, XorGate, XnorGate, Inverter];
-let Tool = Object.freeze({
+const gateTypes = [AndGate, NandGate, OrGate, NorGate, XorGate, XnorGate, Inverter];
+const Tool = Object.freeze({
     Add: 0,
     Delete: 0,
     Edit: 2,
     Move: 3,
     Pan: 4,
 });
+let currentTool = Tool.Add;
 
 let addComponentMenu = new Toolbar()
                         .setPadding(3)
@@ -54,6 +55,33 @@ let editComponentMenu = new Toolbar()
                         .hide()
                         .push();
 let editingComponent;
+
+let toolToolbar = new Toolbar()
+                        .setPadding(3)
+                        .setBackground('#eee')
+                        .setClickColor('#ccc')
+                        .setHoverColor('#dedede')
+                        .setPos(zeroVector.copy())
+                        .add(
+                            (() => {
+                                let items = [];
+
+                                for (let tool of Object.keys(Tool)) {
+                                    items.push(new ToolbarItem(tool + '.png', 50, 50, () => currentTool = Tool[tool], false));
+                                }
+
+                                return items;
+                            })()
+                        )
+                        .show()
+                        .push();
+
+function hideContextMenus() {
+    toolbars.forEach(toolbar => {
+        if (toolbar.hideOnClick)
+            toolbar.hide()
+    });
+}
 
 /**
  * 
@@ -163,7 +191,7 @@ window.onmousedown = e => {
         });
 
         if (!hoveredToolbar)
-            toolbars.forEach(toolbar => toolbar.hide());
+            hideContextMenus();
     }
 
     if (e.which == 3) {

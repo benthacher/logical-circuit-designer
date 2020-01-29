@@ -103,7 +103,7 @@ class Vector {
     }
 }
 
-const zeroVector = new Vector(0, 0);
+const zeroVector = Object.freeze(new Vector(0, 0));
 
 Vector.draw = (basePos, vec, color) => {
     lineTo(basePos.x, basePos.y, basePos.x + vec.x, basePos.y + vec.y, color, 2, true, Layer.UI);
