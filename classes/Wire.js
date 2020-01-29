@@ -99,13 +99,6 @@ class Wire {
     setValue(value) {
         this.value = value;
     }
-
-    copy(start, end, endIndex) {
-        let copy = new Wire(this.color).setStart(start).setEnd(end, endIndex).setValue(this.value);
-        copy.stops = [...this.stops];
-        
-        return copy;
-    }
 }
 
 Wire.trueColor = '#0f0';
