@@ -3,7 +3,7 @@ let mouse = new Mouse();
 const gateTypes = [AndGate, NandGate, OrGate, NorGate, XorGate, XnorGate, Inverter];
 const Tool = Object.freeze({
     Add: 0,
-    Delete: 0,
+    Delete: 1,
     Edit: 2,
     Move: 3,
     Pan: 4,
@@ -67,7 +67,7 @@ let toolToolbar = new Toolbar()
                                 let items = [];
 
                                 for (let tool of Object.keys(Tool)) {
-                                    items.push(new ToolbarItem(tool + '.png', 50, 50, () => currentTool = Tool[tool], false));
+                                    items.push(new ToolbarItem(tool + '.png', 40, 40, () => currentTool = Tool[tool], false));
                                 }
 
                                 return items;

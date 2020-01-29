@@ -49,19 +49,32 @@ function draw() {
     gates.forEach(gate => gate.draw());
 
     toolbars.forEach(toolbar => toolbar.draw());
+
+    switch (currentTool) {
+        case Tool.Move:
+            canvases[Layer.UI].style.cursor = 'grab';
+            break;
+        case Tool.Pan:
+            canvases[Layer.UI].style.cursor = 'move';
+            break;
+        case Tool.Add:
+            canvases[Layer.UI].style.cursor = 'copy';
+            break;
+        case Tool.Edit:
+            canvases[Layer.UI].style.cursor = 'help';
+            break;
+        case Tool.Delete:
+            canvases[Layer.UI].style.cursor = 'not-allowed';
+            break;
+    }
 }
 
 function logic() {
-    if (mouse.draggingObj)
-        canvases[Layer.UI].style.cursor = 'grabbing';
     if (mouse.down) {
         switch (mouse.which) {
             case 2:
                 let cameraPrevPos = camera.pos.copy();
                 drag(camera.pos, true);
-                
-                if (cameraPrevPos.x !== camera.pos.x || cameraPrevPos.y !== camera.pos.y)
-                    canvases[Layer.UI].style.cursor = 'move';
 
                 if (Wire.displayStops) {
                     wires.forEach(wire => {
@@ -105,15 +118,13 @@ function logic() {
                         pos = mouse.connectionStart.gate.getOutputDisplayPos();
 
                     lineTo(pos.x, pos.y, mouse.getMapPos().x, mouse.getMapPos().y, Wire.noColor, Wire.wireThickness, true, Layer.GAME);
-                    canvases[Layer.UI].style.cursor = 'crosshair';
                 }
                 break;
             case 3:
                 
                 break;
         }
-    } else
-        canvases[Layer.UI].style.cursor = 'auto';
+    }
 
     wires.forEach(wire => {
         if (!Wire.displayStops) 
@@ -126,13 +137,6 @@ function logic() {
             gate.pos.y = Math.floor(gate.pos.y / Gate.gridSize) * Gate.gridSize;
         });
     }
-
-    if (editComponentMenu.display)
-        canvases[Layer.UI].style.cursor = 'help';
-    
-    if (addComponentMenu.display)
-        canvases[Layer.UI].style.cursor = 'copy';
-
 
     Gate.updateValues();
 
