@@ -25,8 +25,28 @@ class GameState {
     }
 
     restore() {
-        gates = this.gates;
-        wires = this.wires;
+        gates = [];
+        wires = [];
+
+        this.gates.forEach(gate => {
+            gates.push(gate.copy());
+        });
+
+        this.wires.forEach(wire => {
+            let startCopy = gates[this.gates.indexOf(wire.start)];
+            let endCopy = gates[this.gates.indexOf(wire.end)];
+            let wireCopy = new Wire();
+
+            wireCopy.setStart(startCopy);
+            wireCopy.setEnd(endCopy, wire.endIndex);
+
+            startCopy.attachOutput(wireCopy);
+            endCopy.attachInput(wireCopy, wire.endIndex);
+
+            wire.stops.forEach(stop => wireCopy.stops.push(stop.copy()));
+
+            wires.push(wireCopy);
+        });
     }
 
     isCurrent() {
