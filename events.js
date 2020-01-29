@@ -238,7 +238,7 @@ window.onmousedown = e => {
         }
     }
     if (e.which == 2) {
-        toolbars.forEach(toolbar => toolbar.hide());
+        hideContextMenus();
         gates.forEach(gate => {
             if (mouse.isTouching(gate))
                 gate.remove();
