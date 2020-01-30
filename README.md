@@ -11,15 +11,16 @@ For now, the app simply runs in browser by opening the `index.html`.
 Run on chrome version 51 or higher.
 
 ## Controls
-###### (soon to be updated in favor of a toolbar)
-#### Mouse
-- Left click:
-  - Drag: move component
-  - Drag on connection point: create wire
-- Right click: edit/add component
-- Middle click:
-  - Drag: pan
-  - Click: delete component or wire stop
+#### Tools
+- Move:
+    - Left Click: drag component or wire stop
+    - Right Click: remove component or wire stop
+- Add: open add component menu
+- Net:
+    - Left Click: connect gates
+    - Right Click: create stop in wire
+- Edit: open edit component menu
+- Pan: move camera
 #### Keyboard
 - Shift: toggle grid snap, show connection points
 - c: toggle colors
@@ -28,7 +29,8 @@ Run on chrome version 51 or higher.
 - Ctrl+y: redo
 
 ## TODO:
-- [ ] Change right, middle, and left click functions into one big toolbar
+- [X] Change right, middle, and left click functions into one big toolbar
 - [ ] Fix wire snapping
 - [X] Create Undo/Redo stack feature
 - [ ] Clean up minor bugs
+- [ ] Fix Key input issue

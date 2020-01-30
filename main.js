@@ -16,8 +16,8 @@ function init() {
 
     inputA = new Input(new Vector(100, 500), 'A', true).push();
     
-    callbackHandler.attach('Shift', CallbackMode.PRESS,   () => Wire.displayStops = true );
-    callbackHandler.attach('Shift', CallbackMode.RELEASE, () => Wire.displayStops = false);
+    callbackHandler.attach('Shift', CallbackMode.HOLD,   () => Wire.displayStops = true );
+    // callbackHandler.attach('Shift', CallbackMode.RELEASE, () => Wire.displayStops = false);
 
     callbackHandler.attach('g', CallbackMode.PRESS, () => drawGrid = !drawGrid);
     callbackHandler.attach('c', CallbackMode.PRESS, () => Wire.showColors = !Wire.showColors);
@@ -34,7 +34,6 @@ function init() {
             console.log(currentTool, enumVal);
         });
     }
-    // callbackHandler.attach('1', CallbackMode.PRESS, () => console.log('1'));
 
     GameState.save();
 }
@@ -72,13 +71,18 @@ function draw() {
         case Tool.Edit:
             canvases[Layer.UI].style.cursor = 'help';
             break;
-        case Tool.Delete:
-            canvases[Layer.UI].style.cursor = 'not-allowed';
+        case Tool.Net:
+            canvases[Layer.UI].style.cursor = 'crosshair';
+            break;
+        case Tool.Pointer:
+            canvases[Layer.UI].style.cursor = 'auto';
             break;
     }
 }
 
 function logic() {
+    Wire.displayStops = currentTool == Tool.Net || currentTool == Tool.Move;
+
     if (mouse.down) {
         switch (currentTool) {
             case Tool.Move:
@@ -110,47 +114,7 @@ function logic() {
             case Tool.Pan:
                 drag(camera.pos, true);
                 break;
-        }
-
-
-        switch (mouse.which) {
-            case 2:
-                // drag(camera.pos, true);
-
-                if (Wire.displayStops) {
-                    wires.forEach(wire => {
-                        wire.stops.forEach((stop, i) => {
-                            if (dist(stop, mouse.getMapPos()) < Gate.ioDisplayRadius)
-                                wire.stops.splice(i, 1);
-                        });
-                    });
-                }
-                break;
-            case 1:
-                // gates.forEach(gate => {
-                //     if (gate == mouse.draggingObj) {
-                //         if (mouse.draggingObjPos)
-                //             gate.pos.set(
-                //                 mouse.draggingObjPos
-                //                     .subtract(mouse.drag
-                //                         .subtract(mouse.pos)
-                //                         .divide(camera.zoom)));
-                //     }
-                // });
-                // if (Wire.displayStops) {
-                //     wires.forEach(wire => {
-                //         wire.stops.forEach(stop => {
-                //             if (stop == mouse.draggingObj) {
-                //                 if (mouse.draggingObjPos)
-                //                     stop.set(
-                //                         mouse.draggingObjPos
-                //                             .subtract(mouse.drag
-                //                                 .subtract(mouse.pos)
-                //                                 .divide(camera.zoom)));
-                //             }
-                //         });
-                //     });
-                // }
+            case Tool.Net:
                 if (mouse.connectionStart) {
                     let pos;
                     if (mouse.connectionStart.i > -1)
@@ -160,9 +124,6 @@ function logic() {
 
                     lineTo(pos.x, pos.y, mouse.getMapPos().x, mouse.getMapPos().y, Wire.noColor, Wire.wireThickness, true, Layer.GAME);
                 }
-                break;
-            case 3:
-                
                 break;
         }
     }

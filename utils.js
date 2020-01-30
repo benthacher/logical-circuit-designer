@@ -47,7 +47,7 @@ function round(n, d) {
     return Math.round(n * (10 ** d)) / (10 ** d);
 }
 
-function isCollidingBala(p1, p2, center, r) {
+function isIntersecting(p1, p2, center, r) {
     let midpoint = p1.subtract(p1.subtract(p2).divide(2));
     let length = dist(p1, p2);
 

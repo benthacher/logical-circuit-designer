@@ -11,10 +11,10 @@ const gateTypes = [AndGate, NandGate, OrGate, NorGate, XorGate, XnorGate, Invert
 // The only reason I did this was to make it easier to rearrange the tools if I wanted to
 
 const Tool = Object.freeze(
-    ['Move', 'Add', 'Delete', 'Edit', 'Pan']
+    ['Pointer', 'Move', 'Add', 'Net', 'Edit', 'Pan']
     .reduce((obj, val, i) => Object.assign(obj, { [val]: i + 1 }), {}));
 
-let currentTool = Tool.Add;
+let currentTool = Tool.Pointer;
 
 let addComponentMenu = new Toolbar()
                         .setPadding(3)
@@ -24,13 +24,14 @@ let addComponentMenu = new Toolbar()
                         .setPos(zeroVector.copy())
                         .add(
                             new ToolbarItem('Input.png', 50, 50, () => {
+                                mouse.down = false;
                                 let label = prompt('Label for input:');
                                 if (!label)
                                     return;
                                 let value = prompt('Value for input:');
 
                                 if (value)
-                                    new Input(mouse.getMapPos(), label, value == 'true').push()
+                                    new Input(mouse.getMapPos(), label, value == 'true').push();
                             }, true)
                         )
                         .add(
@@ -38,7 +39,10 @@ let addComponentMenu = new Toolbar()
                                 let items = [];
 
                                 gateTypes.forEach(type => {
-                                    items.push(new ToolbarItem(new type().constructor.name + '.png', 50, 50, () => new type(mouse.getMapPos()).push(), true),)
+                                    items.push(new ToolbarItem(new type().constructor.name + '.png', 50, 50, () => {
+                                        new type(mouse.getMapPos()).push();
+                                        currentTool = Tool.Move;
+                                    }, true))
                                 });
 
                                 return items;
@@ -54,7 +58,10 @@ let editComponentMenu = new Toolbar()
                         .setHoverColor('#dedede')
                         .setPos(zeroVector.copy())
                         .add([
-                            new ToolbarItem('numInputs.png', 50, 50, () => editingComponent.setNumInputs(prompt('Num inputs:') || 1), true),
+                            new ToolbarItem('numInputs.png', 50, 50, () => {
+                                mouse.down = false;
+                                editingComponent.setNumInputs(prompt('Num inputs:') || 1);
+                            }, true),
                             new ToolbarItem('toggleOutput.png', 50, 50, () => {
                                 if (editingComponent.setValue)
                                     editingComponent.setValue(!editingComponent.value)
@@ -86,7 +93,7 @@ let toolToolbar = new Toolbar()
 
 function hideContextMenus() {
     toolbars.forEach(toolbar => {
-        if (toolbar.hideOnClick)
+        if (toolbar.items[0].hideOnClick)
             toolbar.hide()
     });
 }
@@ -144,50 +151,165 @@ window.onmousedown = e => {
     mouse.which = e.which;
     mouse.drag = mouse.pos.copy();
 
-    if (e.which == 1) {
-        gates.forEach(gate => {
-            if (mouse.isTouching(gate) && mouse.canDrag) {
-                mouse.draggingObj = gate;
-            }
-
-            if (gate == mouse.draggingObj) {
-                if (mouse.isTouching(gate) && mouse.canDrag) {
-                    mouse.canDrag = false;
-                    mouse.draggingObjPos = gate.pos.copy();
-                    mouse.drag = mouse.pos.copy();
+    switch (currentTool) {
+        case Tool.Add:
+            addComponentMenu.setPos(mouse.pos.copy()).show();
+            editComponentMenu.hide();
+            editingComponent = null;
+            currentTool = Tool.Pointer;
+            break;
+        case Tool.Edit:
+            let touchingGate = false;
+            gates.forEach(gate => {
+                if (mouse.isTouching(gate)) {
+                    editingComponent = gate;
+                    touchingGate = true;
                 }
-            }
-        });
+            });
 
-        if (Wire.displayStops) {
-            wires.forEach(wire => {
-                wire.stops.forEach(stop => {
-                    if (dist(stop, mouse.getMapPos()) < Gate.ioDisplayRadius && mouse.canDrag) {
-                        mouse.draggingObj = stop;
+            if (touchingGate) {
+                editComponentMenu.setPos(mouse.pos.copy()).show();
+                addComponentMenu.hide();
+            }
+            break;
+        case Tool.Move:
+            if (mouse.which == 1) {
+                gates.forEach(gate => {
+                    if (mouse.isTouching(gate) && mouse.canDrag) {
+                        mouse.draggingObj = gate;
                     }
-    
-                    if (stop == mouse.draggingObj) {
-                        if (dist(stop, mouse.getMapPos()) < Gate.ioDisplayRadius && mouse.canDrag) {
+        
+                    if (gate == mouse.draggingObj) {
+                        if (mouse.isTouching(gate) && mouse.canDrag) {
                             mouse.canDrag = false;
-                            mouse.draggingObjPos = stop.copy();
+                            mouse.draggingObjPos = gate.pos.copy();
                             mouse.drag = mouse.pos.copy();
                         }
                     }
                 });
-            });
-
-            gates.forEach(gate => {
-                for (let i = 0; i < gate.numInputs; i++) {
-                    if (dist(gate.getInputDisplayPos(i), mouse.getMapPos()) < Gate.ioDisplayRadius) {
-                        mouse.connectionStart = { gate, i };
-                        return;
+                
+                if (Wire.displayStops) {
+                    wires.forEach(wire => {
+                        wire.stops.forEach(stop => {
+                            if (dist(stop, mouse.getMapPos()) < Gate.ioDisplayRadius && mouse.canDrag) {
+                                mouse.draggingObj = stop;
+                            }
+            
+                            if (stop == mouse.draggingObj) {
+                                if (dist(stop, mouse.getMapPos()) < Gate.ioDisplayRadius && mouse.canDrag) {
+                                    mouse.canDrag = false;
+                                    mouse.draggingObjPos = stop.copy();
+                                    mouse.drag = mouse.pos.copy();
+                                }
+                            }
+                        });
+                    });
+                }
+            } else if (mouse.which == 3) {
+                gates.forEach(gate => {
+                    if (mouse.isTouching(gate))
+                        gate.remove();
+                    
+                    for (let i = 0; i < gate.numInputs; i++) {
+                        if (gate.inputs[i] && dist(gate.getInputDisplayPos(i), mouse.getMapPos()) < Gate.ioDisplayRadius) {
+                            gate.inputs[i].release();
+                            return;
+                        }
                     }
+                });
+                if (Wire.displayStops) {
+                    wires.forEach(wire => {
+                        wire.stops.forEach((stop, i) => {
+                            if (dist(stop, mouse.getMapPos()) < Gate.ioDisplayRadius)
+                                wire.stops.splice(i, 1);
+                        });
+                    });
                 }
-                if (dist(gate.getOutputDisplayPos(), mouse.getMapPos()) < Gate.ioDisplayRadius) {
-                    mouse.connectionStart = { gate, i: -1 };
-                    return;
-                }
-            });
+                break;
+            }
+            break;
+        case Tool.Net:
+            switch (mouse.which) {
+                case 1:
+                    gates.forEach(gate => {
+                        for (let i = 0; i < gate.numInputs; i++) {
+                            if (dist(gate.getInputDisplayPos(i), mouse.getMapPos()) < Gate.ioDisplayRadius) {
+                                mouse.connectionStart = { gate, i };
+                                return;
+                            }
+                        }
+                        if (dist(gate.getOutputDisplayPos(), mouse.getMapPos()) < Gate.ioDisplayRadius) {
+                            mouse.connectionStart = { gate, i: -1 };
+                            return;
+                        }
+                    });
+                    break;
+                case 3:
+                    wires.forEach(wire => {
+                        let displayStart = wire.start.getOutputDisplayPos();
+                        let displayEnd = wire.end.getInputDisplayPos(wire.endIndex);
+                
+                        let totalStops = [displayStart, ...wire.stops, displayEnd];
+        
+                        for (let i = 0; i < totalStops.length - 1; i++) {
+                            let initial = totalStops[i];
+                            let final = totalStops[i + 1];
+        
+                            if (isIntersecting(initial, final, mouse.getMapPos(), Gate.ioDisplayRadius)) {
+                                wire.stops.splice(i, 0, mouse.getMapPos());
+                                currentTool = Tool.Move;
+                            }
+                        }
+                    });
+                    break;
+            }
+            
+    }
+
+    if (e.which == 1) {
+        // gates.forEach(gate => {
+        //     if (mouse.isTouching(gate) && mouse.canDrag) {
+        //         mouse.draggingObj = gate;
+        //     }
+
+        //     if (gate == mouse.draggingObj) {
+        //         if (mouse.isTouching(gate) && mouse.canDrag) {
+        //             mouse.canDrag = false;
+        //             mouse.draggingObjPos = gate.pos.copy();
+        //             mouse.drag = mouse.pos.copy();
+        //         }
+        //     }
+        // });
+
+        if (Wire.displayStops) {
+        //     wires.forEach(wire => {
+        //         wire.stops.forEach(stop => {
+        //             if (dist(stop, mouse.getMapPos()) < Gate.ioDisplayRadius && mouse.canDrag) {
+        //                 mouse.draggingObj = stop;
+        //             }
+    
+        //             if (stop == mouse.draggingObj) {
+        //                 if (dist(stop, mouse.getMapPos()) < Gate.ioDisplayRadius && mouse.canDrag) {
+        //                     mouse.canDrag = false;
+        //                     mouse.draggingObjPos = stop.copy();
+        //                     mouse.drag = mouse.pos.copy();
+        //                 }
+        //             }
+        //         });
+        //     });
+
+            // gates.forEach(gate => {
+            //     for (let i = 0; i < gate.numInputs; i++) {
+            //         if (dist(gate.getInputDisplayPos(i), mouse.getMapPos()) < Gate.ioDisplayRadius) {
+            //             mouse.connectionStart = { gate, i };
+            //             return;
+            //         }
+            //     }
+            //     if (dist(gate.getOutputDisplayPos(), mouse.getMapPos()) < Gate.ioDisplayRadius) {
+            //         mouse.connectionStart = { gate, i: -1 };
+            //         return;
+            //     }
+            // });
         }
 
         let hoveredToolbar = false;
@@ -198,59 +320,12 @@ window.onmousedown = e => {
             });
         });
 
-        if (!hoveredToolbar)
-            hideContextMenus();
+        // if (!hoveredToolbar)
+        //     hideContextMenus();
     }
 
-    if (e.which == 3) {
-        if (Wire.displayStops) {
-            wires.forEach(wire => {
-                let displayStart = wire.start.getOutputDisplayPos();
-                let displayEnd = wire.end.getInputDisplayPos(wire.endIndex);
-        
-                let totalStops = [displayStart, ...wire.stops, displayEnd];
-
-                for (let i = 0; i < totalStops.length - 1; i++) {
-                    let initial = totalStops[i];
-                    let final = totalStops[i + 1];
-
-                    if (isCollidingBala(initial, final, mouse.getMapPos(), Gate.ioDisplayRadius))
-                        wire.stops.splice(i, 0, mouse.getMapPos());
-                }
-            });
-        }
-
-        let touchingGate = false;
-        gates.forEach(gate => {
-            if (mouse.isTouching(gate)) {
-                editingComponent = gate;
-                touchingGate = true;
-            }
-        });
-        
-        if (touchingGate) {
-            editComponentMenu.setPos(mouse.pos.copy()).show();
-            addComponentMenu.hide();
-        } else {
-            addComponentMenu.setPos(mouse.pos.copy()).show();
-            editComponentMenu.hide();
-            editingComponent = null;
-        }
-    }
-    if (e.which == 2) {
+    if (e.which == 2)
         hideContextMenus();
-        gates.forEach(gate => {
-            if (mouse.isTouching(gate))
-                gate.remove();
-            
-            for (let i = 0; i < gate.numInputs; i++) {
-                if (gate.inputs[i] && dist(gate.getInputDisplayPos(i), mouse.getMapPos()) < Gate.ioDisplayRadius) {
-                    gate.inputs[i].release();
-                    return;
-                }
-            }
-        });
-    }
 }
 
 window.onmouseup = e => {
